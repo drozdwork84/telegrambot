@@ -89,8 +89,6 @@ async def reminder_scheduler():
     
     while True:
         try:
-            await asyncio.sleep(30)
-            
             now = datetime.now(MOSCOW_TZ)
             matches = await get_matches_for_reminders()
             
@@ -98,8 +96,9 @@ async def reminder_scheduler():
                 match_dt = datetime.fromisoformat(match["match_datetime"])
                 
                 time_diff = match_dt - now
+                total_seconds = time_diff.total_seconds()
                 
-                if timedelta(seconds=50) <= time_diff <= timedelta(seconds=70):
+                if 45 <= total_seconds <= 75:
                     time_str = match_dt.strftime("%H:%M")
                     message_text = f"Через минуту матч в {time_str} — {match['title']}"
                     
@@ -109,10 +108,12 @@ async def reminder_scheduler():
                         logger.info(f"Sent reminder for match {match['id']}: {match['title']}")
                     except Exception as e:
                         logger.error(f"Failed to send reminder for match {match['id']}: {e}")
+            
+            await asyncio.sleep(15)
         
         except Exception as e:
             logger.error(f"Error in reminder scheduler: {e}")
-            await asyncio.sleep(30)
+            await asyncio.sleep(15)
 
 
 async def main():

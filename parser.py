@@ -49,14 +49,11 @@ def parse_match_line(line: str) -> Optional[Tuple[datetime, str]]:
                     if len(parts) >= 3:
                         title = parts[2]
                     elif len(parts) >= 1:
-                        title = parts[0]
+                        title = ' — '.join(parts)
                     else:
-                        title = remainder
+                        title = remainder if remainder else "Матч"
                 else:
-                    parts = remainder.split()
-                    if len(parts) >= 3:
-                        title = ' '.join(parts[2:])
-                    elif len(parts) > 0:
+                    if remainder:
                         title = remainder
                     else:
                         title = "Матч"
