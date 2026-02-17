@@ -78,3 +78,57 @@ async def mark_as_reminded(match_id: int) -> None:
             (match_id,)
         )
         await db.commit()
+
+
+async def get_next_match(chat_id: int) -> Optional[Dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """
+            SELECT id, match_datetime, title
+            FROM matches
+            WHERE chat_id = ? AND match_datetime > ?
+            ORDER BY match_datetime ASC
+            LIMIT 1
+            """, (chat_id, datetime.now(MOSCOW_TZ).isoformat())
+        )
+        row = await cursor.fetchone()
+        return dict(row) if row else None
+
+
+async def delete_match(match_id: int, chat_id: int) -> bool:
+    """Delete a match by ID and chat_id. Returns True if deleted."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "DELETE FROM matches WHERE id = ? AND chat_id = ?",
+            (match_id, chat_id)
+        )
+        await db.commit()
+        return cursor.rowcount > 0
+
+
+async def update_match_time(match_id: int, chat_id: int, new_datetime: datetime) -> bool:
+    """Update match time and reset reminded status"""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "UPDATE matches SET match_datetime = ?, reminded = 0 WHERE id = ? AND chat_id = ?",
+            (new_datetime.isoformat(), match_id, chat_id)
+        )
+        await db.commit()
+        return cursor.rowcount > 0
+
+
+async def get_all_upcoming_matches(chat_id: int) -> List[Dict]:
+    """Get all future matches for the specified chat"""
+    now = datetime.now(MOSCOW_TZ)
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT id, match_datetime, title FROM matches 
+               WHERE chat_id = ? AND match_datetime > ?
+               ORDER BY match_datetime ASC""",
+            (chat_id, now.isoformat())
+        ) as cursor:
+            rows = await cursor.fetchall()
+            return [dict(row) for row in rows]
+

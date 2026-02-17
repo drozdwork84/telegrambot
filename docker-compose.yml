@@ -1,0 +1,11 @@
+services:
+  bot:
+    build: .
+    restart: always
+    volumes:
+      - ./matches.db:/app/matches.db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
