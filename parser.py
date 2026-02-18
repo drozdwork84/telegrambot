@@ -19,8 +19,8 @@ DATETIME_PARSERS = [
     "%d/%m/%Y %H:%M",
 ]
 
-# Новый шаблон только для времени, например "18:10 что-то", "20-09 Матч"
-TIME_ONLY_REGEX = re.compile(r"^(\d{2})[:\-](\d{2})\s+[–-]?\s*(.+)$")
+# Новый шаблон только для времени, например "18:10", "18:10 что-то", "20-09 - Матч"
+TIME_ONLY_REGEX = re.compile(r"^(\d{2})[:\-](\d{2})(?:\s+[–-]?\s*(.*))?$", re.IGNORECASE)
 
 def parse_match_line(line: str, current_dt: Optional[datetime]=None) -> Optional[Tuple[datetime, str]]:
     """
