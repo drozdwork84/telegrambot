@@ -29,23 +29,33 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 
+HELP_TEXT = (
+    "Привет! Я бот для напоминаний о матчах.\n\n"
+    "Просто отправьте мне текст с расписанием матчей, и я буду напоминать вам за 1 минуту до начала каждого матча.\n\n"
+    "Формат даты/времени: DD.MM.YYYY HH:MM\n"
+    "Например:\n"
+    "16.11.2025 08:55\tДинамо — Спартак\n\n"
+    "Команды:\n"
+    "/start - показать это сообщение\n"
+    "/help - список доступных команд\n"
+    "/today - матчи на сегодня\n"
+    "/list - все будущие матчи\n"
+    "/next - ближайший матч\n"
+    "/delete ID - удалить матч\n"
+    "/edit ID Время - изменить время (например: /edit 5 18:30)"
+)
+
+
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     """Handle /start command"""
-    await message.answer(
-        "Привет! Я бот для напоминаний о матчах.\n\n"
-        "Просто отправьте мне текст с расписанием матчей, и я буду напоминать вам за 1 минуту до начала каждого матча.\n\n"
-        "Формат даты/времени: DD.MM.YYYY HH:MM\n"
-        "Например:\n"
-        "16.11.2025 08:55\tДинамо — Спартак\n\n"
-        "Команды:\n"
-        "/start - показать это сообщение\n"
-        "/today - матчи на сегодня\n"
-        "/list - все будущие матчи\n"
-        "/next - ближайший матч\n"
-        "/delete ID - удалить матч\n"
-        "/edit ID Время - изменить время (например: /edit 5 18:30)"
-    )
+    await message.answer(HELP_TEXT)
+
+
+@dp.message(Command("help"))
+async def cmd_help(message: types.Message):
+    """Handle /help command"""
+    await message.answer(HELP_TEXT)
 
 
 @dp.message(Command("today"))
